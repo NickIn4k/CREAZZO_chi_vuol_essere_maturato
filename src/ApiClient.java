@@ -34,12 +34,15 @@ public class ApiClient {
         // fromJson => da json a classe
         APIResponse apiResponse = gson.fromJson(response.body(), APIResponse.class);
 
-        // foreach di ogni results
-        for(APIQuestions question: apiResponse.results){
-            System.out.println(question.question);
-            System.out.println(question.correct_answer + "\n");
+        if(apiResponse.response_code != 0){
+            // foreach di ogni results
+            for(APIQuestions question: apiResponse.results){
+                System.out.println(question.question);
+                System.out.println(question.correct_answer + "\n");
+            }
         }
 
+        if(response.statusCode() == 200){}
         return response.body();
     }
 }
