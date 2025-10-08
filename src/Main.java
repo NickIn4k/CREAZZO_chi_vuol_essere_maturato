@@ -1,8 +1,13 @@
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
         ApiClient api = new ApiClient();
-        System.out.println(api.fetchQuestions(5, "easy", "multiple"));
+
+        System.out.println("Inserisci numero di domande: ");
+        int amount = sc.nextInt();
+
+        System.out.println(api.fetchQuestions(amount, "easy", "multiple"));
     }
 }

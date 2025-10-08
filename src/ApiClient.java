@@ -1,3 +1,5 @@
+import com.google.gson.Gson;
+
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -25,6 +27,17 @@ public class ApiClient {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
         }catch(IOException | InterruptedException e){
             return "Error: " + e.getMessage();
+        }
+
+        Gson gson = new Gson();
+        // .class prende la struttura della classe
+        // fromJson => da json a classe
+        APIResponse apiResponse = gson.fromJson(response.body(), APIResponse.class);
+
+        // foreach di ogni results
+        for(APIQuestions question: apiResponse.results){
+            System.out.println(question.question);
+            System.out.println(question.correct_answer + "\n");
         }
 
         return response.body();
