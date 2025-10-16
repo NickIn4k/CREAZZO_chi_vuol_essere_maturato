@@ -10,7 +10,6 @@ public class ApiClient {
 
     // Qui si farà la richiesta, ottenere il body e stamparlo
     public String fetchQuestions(int amount, String difficulty, String type){
-        // https://opentdb.com/api.php?amount=5&difficulty=easy&type=multiple
         String url = "https://opentdb.com/api.php?amount=" + amount + "&difficulty="
                 + difficulty + "&type=" + type;
 
@@ -34,15 +33,14 @@ public class ApiClient {
         // fromJson => da json a classe
         APIResponse apiResponse = gson.fromJson(response.body(), APIResponse.class);
 
-        if(apiResponse.response_code != 0){
+        if(response.statusCode() == 200){
             // foreach di ogni results
             for(APIQuestions question: apiResponse.results){
                 System.out.println(question.question);
-                System.out.println(question.correct_answer + "\n");
+                System.out.println(question.correct_answer);
             }
         }
 
-        if(response.statusCode() == 200){}
         return response.body();
     }
 }

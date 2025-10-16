@@ -6,3 +6,11 @@ Durante il gioco, il giocatore potrà usufruire di due aiuti: <br>
 - Suggerimento dei compagni (aiuto del pubblico) => mostra le percentuali delle risposte suggerite dal “pubblico”
 
 Al termine della partita, i dati di gioco verranno salvati in un file JSON, contenente: nome del giocatore, numero di domande risposte correttamente, se l’aiuto 50/50 è stato utilizzato, se l’aiuto del pubblico è stato utilizzato.
+
+### Base progetto:
+- classe User (salvata su file JSON) con decisione dal main: "nuovo utente o seleziona utente"
+- domande prese da API
+  - ogni domanda corretta => +2 punti
+  - formattazione del testo (caratteri non riconosciuti nel terminale)
+  - bisogna fare uno shuffle delle risposte
+- Gestione 

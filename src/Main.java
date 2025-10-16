@@ -8,6 +8,6 @@ public class Main {
         System.out.println("Inserisci numero di domande: ");
         int amount = sc.nextInt();
 
-        System.out.println(api.fetchQuestions(amount, "easy", "multiple"));
+        api.fetchQuestions(amount, "easy", "multiple");
     }
 }
