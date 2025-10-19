@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 
 public class ApiClient {
     private final HttpClient client = HttpClient.newHttpClient();
+    private final Gson gson = new Gson();
 
     // Qui si farà la richiesta, ottenere il body e stamparlo
-    public String fetchQuestions(int amount, String difficulty, String type){
+    public List<APIQuestions> fetchQuestions(int amount, String difficulty, String type){
         String url = "https://opentdb.com/api.php?amount=" + amount + "&difficulty="
                 + difficulty + "&type=" + type;
 
@@ -25,22 +27,22 @@ public class ApiClient {
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
         }catch(IOException | InterruptedException e){
-            return "Error: " + e.getMessage();
+            throw new RuntimeException(e);
         }
 
-        Gson gson = new Gson();
+        if(response == null)
+            throw new RuntimeException("Errore API response");
+
         // .class prende la struttura della classe
         // fromJson => da json a classe
         APIResponse apiResponse = gson.fromJson(response.body(), APIResponse.class);
 
-        if(response.statusCode() == 200){
-            // foreach di ogni results
-            for(APIQuestions question: apiResponse.results){
-                System.out.println(question.question);
-                System.out.println(question.correct_answer);
-            }
-        }
+        if(apiResponse == null || apiResponse.results == null)
+            throw new RuntimeException("Errore API response");
 
-        return response.body();
+        for(APIQuestions qst : apiResponse.results)
+            qst.shuffleAnswers();
+
+        return apiResponse.results;
     }
 }
