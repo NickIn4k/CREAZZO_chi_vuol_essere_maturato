@@ -49,6 +49,23 @@ public class Main {
         n_risp += askQuestions(api, sc, "medium", 3);
         n_risp += askQuestions(api, sc, "hard", 2);
 
+        System.out.println("                                                           \n" +
+                "                                                           \n" +
+                "    ,---,.                                ___              \n" +
+                "  ,'  .' |  ,--,                 ,--,   ,--.'|_            \n" +
+                ",---.'   |,--.'|         ,---, ,--.'|   |  | :,'   ,---.   \n" +
+                "|   |   .'|  |,      ,-+-. /  ||  |,    :  : ' :  '   ,'\\  \n" +
+                ":   :  :  `--'_     ,--.'|'   |`--'_  .;__,'  /  /   /   | \n" +
+                ":   |  |-,,' ,'|   |   |  ,\"' |,' ,'| |  |   |  .   ; ,. : \n" +
+                "|   :  ;/|'  | |   |   | /  | |'  | | :__,'| :  '   | |: : \n" +
+                "|   |   .'|  | :   |   | |  | ||  | :   '  : |__'   | .; : \n" +
+                "'   :  '  '  : |__ |   | |  |/ '  : |__ |  | '.'|   :    | \n" +
+                "|   |  |  |  | '.'||   | |--'  |  | '.'|;  :    ;\\   \\  /  \n" +
+                "|   :  \\  ;  :    ;|   |/      ;  :    ;|  ,   /  `----'   \n" +
+                "|   | ,'  |  ,   / '---'       |  ,   /  ---`-'            \n" +
+                "`----'     ---`-'               ---`-'                     \n" +
+                "                                                           ");
+
         PlayerData toSave = new PlayerData(nome,n_risp,bigliettino,suggerimento);
         // Salvataggio in Append, ma il formato non sarà valido per la gestione futura:
         // Bisognerebbe creare una lista di player leggendo il file, inserire il nuovo giocatore e poi riscrivere il tutto.
@@ -61,12 +78,15 @@ public class Main {
         }
     }
 
-    public static void printQuestion(APIQuestions q) {
+    public static void printQuestion(APIQuestions q, boolean percentage) {
         System.out.println(q.question);
         for(Map.Entry<Character, String> rcd : q.answerList.entrySet()) {
-            Character key = rcd.getKey();
-            String value = rcd.getValue();
-            System.out.println(key + ". " + value);
+            String msg = rcd.getKey() + ". " + rcd.getValue();
+
+            if(percentage)
+                msg+= " ("+ q.answerPercentage.get(rcd.getKey()) + "%)";
+
+            System.out.println(msg);
         }
     }
 
@@ -76,31 +96,39 @@ public class Main {
     }
 
     public static int askQuestions(ApiClient api, Scanner sc, String difficulty, int amount) {
-        System.out.println("\n============================ DOMANDE " + difficulty.toUpperCase() + " ============================\n");
+        System.out.println("=================================== DOMANDE DIFFICOLTA' " + difficulty.toUpperCase() + " ===================================");
         List<APIQuestions> questions = api.fetchQuestions(amount, difficulty, "multiple");
         int cont = 0;
         String ans;
 
         for(APIQuestions qst : questions) {
-            Main.printQuestion(qst);
+            Main.printQuestion(qst, false);
             ans = sc.nextLine();
 
             if(ans.equalsIgnoreCase("BIGLIETTINO") && !Main.bigliettino){
                 Main.bigliettino = true;
                 qst.halfAnswers();
-                Main.printQuestion(qst);
+                Main.printQuestion(qst, false);
                 ans = sc.nextLine();
             }
             else if(ans.equalsIgnoreCase("SUGGERIMENTO") && !Main.suggerimento){
                 Main.suggerimento = true;
+                qst.generatePercentages();
+                Main.printQuestion(qst, true);
+                ans = sc.nextLine();
+            }
+            else if(ans.equalsIgnoreCase("RITIRO")) {
+                System.out.println("Hai deciso di ritirarti. Fine del quiz!");
+                System.exit(0);
             }
 
             if(Main.checkAnswer(ans.charAt(0), qst)){
                 cont++;
-                System.out.println("Risposta esatta!!");
+                System.out.println("Risposta esatta!!\n");
             }
+            else
+                System.out.println("Risposta sbagliata..\n");
         }
-
         return cont;
     }
 }

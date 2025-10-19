@@ -9,7 +9,7 @@ public class APIQuestions {
     public String[] incorrect_answers;
 
     public Map<Character, String> answerList = new HashMap<>();
-    public Map<Character, Integer> answerPercent = new LinkedHashMap<>();
+    public Map<Character, Integer> answerPercentage = new LinkedHashMap<>();
 
     public void shuffleAnswers() {
         List<String> allAnswers = new ArrayList<>();
@@ -27,10 +27,36 @@ public class APIQuestions {
 
     public void generatePercentages() {
         Random rnd = new Random();
-        Integer pCorretta = 50+rnd.nextInt(21); // % tra 50 e 70
-        Integer pRimanente = 100 - pCorretta;
+        int pCorretta = 50+rnd.nextInt(21); // % tra 50 e 70
+        int pRimanente = 100 - pCorretta;
 
-        // DA COMPLETARE
+        Character correctKey = search();
+
+        // Salva risposte sbagliate
+        List<Character> wrongAnswers = new ArrayList<>();
+        for(Character c : answerList.keySet()){
+            if(!c.equals(correctKey))
+                wrongAnswers.add(c);
+        }
+
+        // Generazione percentuali delle risposte sbagliate
+        int somma = 0;
+        List<Integer> percentualiSbagliate = new ArrayList<>();
+        for (int i = 0; i < wrongAnswers.size() - 1; i++) {
+            int val = rnd.nextInt(pRimanente - somma);
+            percentualiSbagliate.add(val);
+            somma += val;
+        }
+
+        percentualiSbagliate.add(pRimanente - somma);
+
+        // Mescola le percentuali
+        Collections.shuffle(percentualiSbagliate);
+
+        answerPercentage.put(correctKey, pCorretta);
+
+        for (int i = 0; i < wrongAnswers.size(); i++)
+            answerPercentage.put(wrongAnswers.get(i), percentualiSbagliate.get(i));
     }
 
     public void halfAnswers(){
@@ -44,7 +70,7 @@ public class APIQuestions {
 
         // Scegli una risposta sbagliata casuale da tenere
         Collections.shuffle(wrongAnswers);
-        Character wrongToKeep = wrongAnswers.get(0);
+        Character wrongToKeep = wrongAnswers.getFirst();
 
         // Crea una nuova mappa con solo la corretta e la sbagliata scelta
         Map<Character, String> newMap = new LinkedHashMap<>();
