@@ -1,4 +1,5 @@
 import java.util.*;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class APIQuestions {
     public String type;
@@ -11,7 +12,18 @@ public class APIQuestions {
     public Map<Character, String> answerList = new HashMap<>();
     public Map<Character, Integer> answerPercentage = new LinkedHashMap<>();
 
+    // Decodifica tutte le stringhe HTML
+    private void decodeHtmlEntities() {
+        question = StringEscapeUtils.unescapeHtml4(question);
+        correct_answer = StringEscapeUtils.unescapeHtml4(correct_answer);
+        for (int i = 0; i < incorrect_answers.length; i++) {
+            incorrect_answers[i] = StringEscapeUtils.unescapeHtml4(incorrect_answers[i]);
+        }
+    }
+
     public void shuffleAnswers() {
+        decodeHtmlEntities();
+
         List<String> allAnswers = new ArrayList<>();
         allAnswers.add(correct_answer);                // Aggiungi la corretta
         allAnswers.addAll(Arrays.asList(incorrect_answers)); // Aggiungi quelle sbagliate
