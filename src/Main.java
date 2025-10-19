@@ -7,15 +7,13 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
+    public static boolean bigliettino = false; // Dimezza
+    public static boolean suggerimento =  false; // % risposta
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         ApiClient api = new ApiClient();
-        List<APIQuestions> appoggio;
         int n_risp = 0;
-        boolean bigliettino = false; // Dimezza
-        boolean suggerimento =  false; // % risposta
-
-        String ans;
 
         // Titolo in ASCII art
         System.out.println("                                                                                 ,--,                                                                                                                         ,----,                                             ,----,             \n" +
@@ -43,47 +41,13 @@ public class Main {
         // Regole
         System.out.println("\n============================ REGOLE ============================\n");
         System.out.println("Rispondi alle domande indicando la lettera della risposta corretta!");
-        System.out.println("Tranquillo, se non sai rispondere puoi sempre chiedere aiuto! Scrivi 'BIGLIETTINO' oppure 'SUGGERIMENTO'" );
+        System.out.println("Tranquillo, se non sai rispondere puoi chiedere aiuto! Scrivi 'BIGLIETTINO' oppure 'SUGGERIMENTO'\n Fa attenzione: per non venire scoperto dai docenti potrai chiedere solo una volta questi aiuti!" );
+        sc.nextLine();
 
-        // Fetch 1
-        System.out.println("\n============================ DOMANDE FACILI ============================\n");
-        appoggio = api.fetchQuestions(5, "easy", "multiple");
-        for(APIQuestions qst : appoggio) {
-            Main.printQuestion(qst);
-            ans = sc.nextLine();
-
-            if(Main.checkAnswer(ans.charAt(0), qst)){
-                n_risp++;
-                System.out.println("Risposta esatta!!");
-            }
-        }
-
-        // Fetch 2
-        System.out.println("\n============================ DOMANDE MEDIE ============================\n");
-        appoggio = api.fetchQuestions(3, "medium", "multiple");
-        for(APIQuestions qst : appoggio) {
-            Main.printQuestion(qst);
-            ans = sc.nextLine();
-
-            if(Main.checkAnswer(ans.charAt(0), qst)){
-                n_risp++;
-                System.out.println("Risposta esatta!!");
-            }
-        }
-
-        // Fetch 3
-        System.out.println("\n============================ DOMANDE DIFFICILI ============================\n");
-        appoggio = api.fetchQuestions(2, "hard", "multiple");
-        for(APIQuestions qst : appoggio) {
-            Main.printQuestion(qst);
-
-            ans = sc.nextLine();
-
-            if(Main.checkAnswer(ans.charAt(0), qst)){
-                n_risp++;
-                System.out.println("Risposta esatta!!");
-            }
-        }
+        // Quiz
+        n_risp += askQuestions(api, sc, "easy", 5);
+        n_risp += askQuestions(api, sc, "medium", 3);
+        n_risp += askQuestions(api, sc, "hard", 2);
 
         PlayerData toSave = new PlayerData(nome,n_risp,bigliettino,suggerimento);
         // Salvataggio in Append, ma il formato non sarà valido per la gestione futura:
@@ -109,5 +73,32 @@ public class Main {
     public static boolean checkAnswer(Character ans, APIQuestions q) {
         char key = Character.toUpperCase(ans);
         return q.correct_answer.equals(q.answerList.get(key));
+    }
+
+    public static int askQuestions(ApiClient api, Scanner sc, String difficulty, int amount) {
+        System.out.println("\n============================ DOMANDE " + difficulty.toUpperCase() + " ============================\n");
+        List<APIQuestions> questions = api.fetchQuestions(amount, difficulty, "multiple");
+        int cont = 0;
+        String ans;
+
+        for(APIQuestions qst : questions) {
+            Main.printQuestion(qst);
+            ans = sc.nextLine();
+
+            if(ans.equalsIgnoreCase("BIGLIETTINO") && !Main.bigliettino){
+
+                Main.bigliettino = true;
+            }
+            else if(ans.equalsIgnoreCase("SUGGERIMENTO") && !Main.suggerimento){
+                Main.suggerimento = true;
+            }
+
+            if(Main.checkAnswer(ans.charAt(0), qst)){
+                cont++;
+                System.out.println("Risposta esatta!!");
+            }
+        }
+
+        return cont;
     }
 }
