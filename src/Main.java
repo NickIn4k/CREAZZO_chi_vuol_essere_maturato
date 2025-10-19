@@ -1,10 +1,10 @@
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     public static boolean bigliettino = false; // Dimezza
@@ -66,16 +66,7 @@ public class Main {
                 "`----'     ---`-'               ---`-'                     \n" +
                 "                                                           ");
 
-        PlayerData toSave = new PlayerData(nome,n_risp,bigliettino,suggerimento);
-        // Salvataggio in Append, ma il formato non sarà valido per la gestione futura:
-        // Bisognerebbe creare una lista di player leggendo il file, inserire il nuovo giocatore e poi riscrivere il tutto.
-        Gson gson = new Gson();
-        try(FileWriter fw = new FileWriter("PlayerData.json", true)) {
-            gson.toJson(toSave, fw);
-            fw.write("");   // Linea di mezzo
-        }catch(IOException e){
-            System.out.println(e.getMessage());
-        }
+        Main.Salvataggio(nome, n_risp);
     }
 
     public static void printQuestion(APIQuestions q, boolean percentage) {
@@ -130,5 +121,35 @@ public class Main {
                 System.out.println("Risposta sbagliata..\n");
         }
         return cont;
+    }
+
+    public static void Salvataggio(String nome, int n_risp){
+        PlayerData toSave = new PlayerData(nome, n_risp, Main.bigliettino, Main.suggerimento);
+        Gson gson = new Gson();
+        List<PlayerData> players = new ArrayList<>();
+
+        // Lettura
+        try(Scanner rd = new Scanner(new File("PlayerData.json"))) {
+            StringBuilder json = new StringBuilder();
+            while(rd.hasNextLine()) {
+                json.append(rd.nextLine());
+            }
+            if(!json.isEmpty()){
+                PlayerData[] old = gson.fromJson(json.toString(), PlayerData[].class);
+                if(old!=null)
+                    players.addAll(Arrays.asList(old));
+            }
+        }catch(FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+
+        players.add(toSave);
+
+        // Scrittura
+        try(FileWriter fw = new FileWriter("PlayerData.json")) {
+            gson.toJson(players, fw);
+        }catch(IOException e){
+            System.out.println(e.getMessage());
+        }
     }
 }
