@@ -86,8 +86,10 @@ public class Main {
             ans = sc.nextLine();
 
             if(ans.equalsIgnoreCase("BIGLIETTINO") && !Main.bigliettino){
-
                 Main.bigliettino = true;
+                qst.halfAnswers();
+                Main.printQuestion(qst);
+                ans = sc.nextLine();
             }
             else if(ans.equalsIgnoreCase("SUGGERIMENTO") && !Main.suggerimento){
                 Main.suggerimento = true;

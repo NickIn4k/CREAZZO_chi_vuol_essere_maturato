@@ -25,7 +25,7 @@ public class APIQuestions {
         }
     }
 
-    private void generatePercentages() {
+    public void generatePercentages() {
         Random rnd = new Random();
         Integer pCorretta = 50+rnd.nextInt(21); // % tra 50 e 70
         Integer pRimanente = 100 - pCorretta;
@@ -33,4 +33,34 @@ public class APIQuestions {
         // DA COMPLETARE
     }
 
+    public void halfAnswers(){
+        Character correctKey = search();
+        List<Character> wrongAnswers = new ArrayList<>();
+
+        for(Character c : answerList.keySet()){
+            if(!c.equals(correctKey))
+                wrongAnswers.add(c);
+        }
+
+        // Scegli una risposta sbagliata casuale da tenere
+        Collections.shuffle(wrongAnswers);
+        Character wrongToKeep = wrongAnswers.get(0);
+
+        // Crea una nuova mappa con solo la corretta e la sbagliata scelta
+        Map<Character, String> newMap = new LinkedHashMap<>();
+        newMap.put('A', answerList.get(correctKey));
+        newMap.put('B', answerList.get(wrongToKeep));
+
+        // Sostituisci la vecchia mappa
+        answerList = newMap;
+    }
+
+    private Character search(){
+        for(Map.Entry<Character, String> entry : answerList.entrySet()){
+            if(entry.getValue().equals(correct_answer)){
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
 }
